@@ -20,10 +20,10 @@ jobs:
           command: doc
           args: --release --all-features --no-deps
       - name: "Prepare docs for Pages"
-        run:
-        - mkdir -p docs
-        - echo "<meta http-equiv=\"refresh\" content=\"0; url=wordweaver-schemata\">" > target/doc/index.html
-        - cp -r target/doc ./docs
+        run: |
+          mkdir -p docs
+          echo "<meta http-equiv=\"refresh\" content=\"0; url=wordweaver-schemata\">" > target/doc/index.html
+          cp -r target/doc ./docs
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
