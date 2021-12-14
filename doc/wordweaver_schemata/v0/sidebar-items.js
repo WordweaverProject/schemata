@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["VERSION",""]],"fn":[["deserialize","Automatically picks the right struct to deserialize the data and deserializes it. It returns a trait object, so you’ll need to downcast it to the right type."]],"struct":[["Conversation",""],["InformationDisclosure",""],["TrustExchange",""]]});
