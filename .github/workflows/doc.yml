@@ -1,0 +1,32 @@
+name: Build Rustdoc
+
+on:
+	push:
+		branches:
+			- main
+
+jobs:
+	docs:
+		runs-on: ubuntu-latest
+		steps:
+			- uses: actions/checkout@v1
+      - name: "Setup Rust toolchain"
+				uses: actions-rs/toolchain@v1
+				with:
+					toolchain: stable
+      - name: "Build docs"
+				uses: actions-rs/cargo@v1
+        with:
+          command: doc
+          args: --release --all-features --no-deps
+			- name: "Prepare docs for Pages"
+				run:
+				- mkdir -p docs
+				- echo "<meta http-equiv=\"refresh\" content=\"0; url=wordweaver-schemata\">" > target/doc/index.html
+				- cp -r target/doc ./docs
+			- name: Deploy
+				uses: peaceiris/actions-gh-pages@v3
+				with:
+					github_token: ${{ secrets.GITHUB_TOKEN }}
+					publish_dir: ./public
+
