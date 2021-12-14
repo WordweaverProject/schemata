@@ -23,7 +23,7 @@ jobs:
         run: |
           mkdir -p docs
           echo "<meta http-equiv=\"refresh\" content=\"0; url=wordweaver-schemata\">" > target/doc/index.html
-          cp -r target/doc ./docs
+          cp -r target/doc/* ./docs
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
