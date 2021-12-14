@@ -6,8 +6,6 @@ use serde::{Deserialize, Serialize};
 #[cfg_attr(feature = "arbitrary_gen", derive(Arbitrary))]
 #[derive(Serialize, Deserialize)]
 pub struct InformationDisclosure {
-	version: usize,
-	schema: usize,
-	data: Vec<u8>,
+	// TODO
 }
 impl Schemata for InformationDisclosure {}
