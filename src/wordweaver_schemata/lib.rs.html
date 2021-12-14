@@ -51,8 +51,50 @@
 <span id="51">51</span>
 <span id="52">52</span>
 <span id="53">53</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::any::Any</span>;
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+<span id="60">60</span>
+<span id="61">61</span>
+<span id="62">62</span>
+<span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
+<span id="71">71</span>
+<span id="72">72</span>
+<span id="73">73</span>
+<span id="74">74</span>
+<span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+</pre><pre class="rust"><code><span class="doccomment">//! The Wordweaver Schemata are defined in this crate as a set of structs.</span>
+<span class="doccomment">//! Schemata are organized by version, and some helper functions are provided to access them by number.</span>
+<span class="attribute">#![<span class="ident">no_std</span>]</span>
+<span class="attribute">#![<span class="ident">warn</span>(<span class="ident">missing_docs</span>)]</span>
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">alloc</span>;
 
+<span class="kw">use</span> <span class="ident">alloc::boxed::Box</span>;
+<span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
+<span class="kw">use</span> <span class="ident">core::any::Any</span>;
+
+<span class="doccomment">/// An error that might occur when operating on the data we describe.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span> {
 	<span class="doccomment">/// This library doesn&#39;t support the specified version.</span>
 	<span class="ident">UnsupportedVersion</span>,
@@ -63,7 +105,7 @@
 }
 
 <span class="doccomment">/// Marker trait for schemata.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Schemata</span>: <span class="ident">Any</span> {}
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">SchemataTrait</span>: <span class="ident">Any</span> {}
 
 <span class="doccomment">/// Generates deserialize_as and SUPPORTED based on the list of versions.</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
@@ -77,21 +119,31 @@
 
 		<span class="doccomment">/// Automatically picks the right version to deserialize the data and deserializes it.</span>
 		<span class="doccomment">/// It returns a trait object, so you&#39;ll need to downcast it to the right type.</span>
-		<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize_as</span>(<span class="ident">version</span>: <span class="ident">usize</span>, <span class="ident">schema</span>: <span class="ident">usize</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Schemata</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+		<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize_as</span>(<span class="ident">version</span>: <span class="ident">usize</span>, <span class="ident">schema</span>: <span class="ident">usize</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">SchemataTrait</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
 			<span class="kw">match</span> <span class="ident">version</span> {
 				$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i::VERSION</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i::deserialize</span>(<span class="ident">schema</span>, <span class="ident">data</span>)<span class="question-mark">?</span>),)<span class="op">+</span>
+				<span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::UnsupportedVersion</span>),
+			}
+		}
+
+		<span class="doccomment">/// Automatically picks the right version to deserialize the data and deserializes it.</span>
+		<span class="doccomment">/// It returns a trait object, so you&#39;ll need to downcast it to the right type.</span>
+		<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize_as</span>(<span class="ident">version</span>: <span class="ident">usize</span>, <span class="ident">data</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident"><span class="kw">crate</span>::SchemataTrait</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+			<span class="kw">match</span> <span class="ident">version</span> {
+				$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i::VERSION</span> =&gt; <span class="prelude-val">Ok</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i::serialize</span>(<span class="ident">data</span>)<span class="question-mark">?</span>),)<span class="op">+</span>
 				<span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident">Error::UnsupportedVersion</span>),
 			}
 		}
 	};
 }
 
+<span class="doccomment">/// Generates serialize and deserialize based on the list of schemata.</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules!</span> <span class="ident">schemata</span> {
 	($((<span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span>:<span class="ident">ident</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>))<span class="op">+</span>) =&gt; {
 		<span class="doccomment">/// Automatically picks the right struct to deserialize the data and deserializes it.</span>
 		<span class="doccomment">/// It returns a trait object, so you&#39;ll need to downcast it to the right type.</span>
-		<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span>(<span class="ident">schema</span>: <span class="ident">usize</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident"><span class="kw">crate</span>::Schemata</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
+		<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize</span>(<span class="ident">schema</span>: <span class="ident">usize</span>, <span class="ident">data</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>]) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident"><span class="kw">crate</span>::SchemataTrait</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
 			<span class="kw">match</span> <span class="ident">schema</span> {
 				$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span> =&gt; <span class="kw">match</span> <span class="ident">serde_cbor::from_slice</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span><span class="op">&gt;</span>(<span class="ident">data</span>) {
 					<span class="prelude-val">Ok</span>(<span class="ident">v</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">Box::new</span>(<span class="ident">v</span>)),
@@ -99,6 +151,20 @@
 				}),<span class="op">+</span>
 				<span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::UnknownSchema</span>),
 			}
+		}
+
+		<span class="doccomment">/// Automatically serializes the data.</span>
+		<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span>(<span class="ident">data</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident"><span class="kw">crate</span>::SchemataTrait</span><span class="op">&gt;</span>) -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>, <span class="ident"><span class="kw">crate</span>::Error</span><span class="op">&gt;</span> {
+			<span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">data</span>.<span class="ident">type_id</span>();
+			$(
+				<span class="kw">if</span> <span class="ident">TypeId::of</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span><span class="op">&gt;</span>() <span class="op">==</span> <span class="ident">kind</span> {
+					<span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">serde_cbor::to_vec</span>(<span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Any</span><span class="op">&gt;</span><span class="ident">::downcast_ref</span>::<span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">i</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">data</span>).<span class="ident">unwrap</span>()) {
+						<span class="prelude-val">Ok</span>(<span class="ident">v</span>) =&gt; <span class="ident">v</span>,
+						<span class="prelude-val">Err</span>(<span class="ident">e</span>) =&gt; <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::InvalidData</span>(<span class="ident">e</span>)),
+					});
+				}
+			)<span class="op">+</span>
+			<span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident"><span class="kw">crate</span>::Error::UnknownSchema</span>);
 		}
 	};
 }

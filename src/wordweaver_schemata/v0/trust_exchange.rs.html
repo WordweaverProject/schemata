@@ -21,22 +21,40 @@
 <span id="21">21</span>
 <span id="22">22</span>
 <span id="23">23</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Schemata</span>;
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::SchemataTrait</span>;
+<span class="kw">use</span> <span class="ident">alloc</span>::{<span class="ident">string::String</span>, <span class="ident">vec::Vec</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;arbitrary_gen&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">arbitrary::Arbitrary</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Deserialize</span>, <span class="ident">Serialize</span>};
 
+<span class="doccomment">/// A trust exchange is used to convey the necessary information to establish communications.</span>
+<span class="doccomment">/// Importing a trust exchange will</span>
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;arbitrary_gen&quot;</span>, <span class="ident">derive</span>(<span class="ident">Arbitrary</span>))]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TrustExchange</span> {
+	<span class="doccomment">/// The public key of the subject.</span>
 	<span class="kw">pub</span> <span class="ident">pubkey</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
+	<span class="doccomment">/// The communication addresses of the subject.</span>
+	<span class="doccomment">/// At least one must be a Standard Transport.</span>
 	<span class="kw">pub</span> <span class="ident">addr</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AddrSpec</span><span class="op">&gt;</span>,
+	<span class="doccomment">/// The name of the subject.</span>
 	<span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
+	<span class="doccomment">/// The maximum data version the subject supports.</span>
 	<span class="kw">pub</span> <span class="ident">data_ver</span>: <span class="ident">usize</span>,
-	<span class="kw">pub</span> <span class="ident">ciphers</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+	<span class="doccomment">/// This must only be empty if this TrustExchange is done physically.</span>
+	<span class="doccomment">/// Otherwise, it must match the public key of the mutually trusted party.</span>
 	<span class="kw">pub</span> <span class="ident">sig</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
 }
-<span class="kw">impl</span> <span class="ident">Schemata</span> <span class="kw">for</span> <span class="ident">TrustExchange</span> {}
+<span class="kw">impl</span> <span class="ident">SchemataTrait</span> <span class="kw">for</span> <span class="ident">TrustExchange</span> {}
 
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;arbitrary_gen&quot;</span>, <span class="ident">derive</span>(<span class="ident">Arbitrary</span>))]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>)]</span>

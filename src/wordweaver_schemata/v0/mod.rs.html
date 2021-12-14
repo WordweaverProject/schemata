@@ -12,8 +12,20 @@
 <span id="12">12</span>
 <span id="13">13</span>
 <span id="14">14</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">super</span>::schemata</span>;
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+</pre><pre class="rust"><code><span class="doccomment">//! This is the first version of the Wordweaver schemata.</span>
 
+<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::schemata</span>;
+<span class="kw">use</span> <span class="ident">alloc::boxed::Box</span>;
+<span class="kw">use</span> <span class="ident">alloc::vec::Vec</span>;
+<span class="kw">use</span> <span class="ident">core::any</span>::{<span class="ident">Any</span>, <span class="ident">TypeId</span>};
+
+<span class="doccomment">/// The version of the module.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">VERSION</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">0</span>;
 
 <span class="kw">mod</span> <span class="ident">trust_exchange</span>;
